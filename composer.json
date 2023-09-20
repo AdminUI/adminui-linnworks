@@ -1,0 +1,29 @@
+{
+	"name": "adminui/adminui-linnworks",
+	"description": "Linnworks integration package for the AdminUI Ecommerce platform",
+	"type": "library",
+	"license": "MIT",
+	"autoload": {
+		"psr-4": {
+			"AdminUI\\AdminUILinnworks\\": "src/"
+		}
+	},
+	"authors": [
+		{
+			"name": "Craig Riley",
+			"email": "c.riley@evomark.co.uk"
+		},
+		{
+			"name": "Kenny Turner",
+			"email": "k.turner@evomark.co.uk"
+		}
+	],
+	"require": {},
+	"extra": {
+		"laravel": {
+			"providers": [
+				"AdminUI\\AdminUILinnworks\\LinnworksServiceProvider"
+			]
+		}
+	}
+}

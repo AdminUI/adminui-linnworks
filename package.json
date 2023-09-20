@@ -1,0 +1,21 @@
+{
+	"name": "@adminui/adminui-linnworks",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "vite",
+		"prod": "vite build",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@vitejs/plugin-basic-ssl": "^1.0.1",
+		"@vitejs/plugin-vue2": "^2.2.0",
+		"laravel-vite-plugin": "^0.8.0",
+		"vite": "^4.4.9",
+		"vite-plugin-adminui": "^1.0.9"
+	}
+}

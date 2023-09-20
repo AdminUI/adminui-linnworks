@@ -1,0 +1,22 @@
+{
+  "resources/index.js": {
+    "dynamicImports": [
+      "resources/pages/Setup.vue"
+    ],
+    "file": "assets/index-ea304ebb.js",
+    "isEntry": true,
+    "src": "resources/index.js"
+  },
+  "resources/pages/Setup.css": {
+    "file": "assets/Setup-3a3da279.css",
+    "src": "resources/pages/Setup.css"
+  },
+  "resources/pages/Setup.vue": {
+    "css": [
+      "assets/Setup-3a3da279.css"
+    ],
+    "file": "assets/Setup-e6c9ca46.js",
+    "isDynamicEntry": true,
+    "src": "resources/pages/Setup.vue"
+  }
+}
