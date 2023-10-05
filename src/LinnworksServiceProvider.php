@@ -5,6 +5,9 @@ namespace AdminUI\AdminUILinnworks;
 use AdminUI\AdminUI\Facades\Seeder;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use AdminUI\AdminUILinnworks\Facades\Linnworks;
+use AdminUI\AdminUILinnworks\Providers\ConfigProvider;
+use AdminUI\AdminUILinnworks\Services\LinnworksService;
 use AdminUI\AdminUILinnworks\Database\Seeders\NavigationSeeder;
 use AdminUI\AdminUILinnworks\Database\Seeders\ConfigurationSeeder;
 
@@ -12,7 +15,12 @@ class LinnworksServiceProvider extends ServiceProvider
 {
     public function register()
     {
+        $this->app->register(ConfigProvider::class);
         $this->loadRoutesFrom(__DIR__ . '/Routes/admin.php');
+
+        $this->app->singleton('linnworks', function () {
+            return new LinnworksService;
+        });
     }
 
     public function boot()
