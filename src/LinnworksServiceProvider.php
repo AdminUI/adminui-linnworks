@@ -3,6 +3,7 @@
 namespace AdminUI\AdminUILinnworks;
 
 use AdminUI\AdminUI\Facades\Seeder;
+use AdminUI\AdminUILinnworks\Commands\ImportStockIds;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use AdminUI\AdminUILinnworks\Facades\Linnworks;
@@ -21,6 +22,7 @@ class LinnworksServiceProvider extends ServiceProvider
         $this->app->singleton('linnworks', function () {
             return new LinnworksService;
         });
+        $this->commands([ImportStockIds::class]);
     }
 
     public function boot()
@@ -33,9 +35,18 @@ class LinnworksServiceProvider extends ServiceProvider
             $this->pushJavascript();
         }
 
-        $this->publishes([
-            $baseDir . '/publish/js' => public_path('vendor/adminui-linnworks')
-        ], 'adminui-public');
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                $baseDir . '/publish/js' => public_path('vendor/adminui-linnworks')
+            ], 'adminui-public');
+
+
+            $this->publishes([
+                $baseDir . '/publish/config/adminui-linnworks.php' => config_path('linnworks.php'),
+            ], 'adminui-public');
+        }
+
+        $this->loadMigrationsFrom(__DIR__ . '/Database/Migrations');
     }
 
     public function pushJavascript()

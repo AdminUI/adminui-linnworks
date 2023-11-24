@@ -2,6 +2,7 @@
 
 namespace AdminUI\AdminUILinnworks\Services;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -14,6 +15,7 @@ class LinnworksService
     public bool $enabled = false;
     public string $appId;
     public string $appSecret;
+    public string $locality;
     public string $refreshToken;
     public string $accessToken;
     public array $appData = [];
@@ -24,6 +26,7 @@ class LinnworksService
         $this->appId = config('linnworks.app_id') ?? "";
         $this->appSecret = config('linnworks.app_secret') ?? "";
         $this->refreshToken = config('linnworks.refresh_token') ?? "";
+        $this->locality = config('linnworks.locality') ?? "";
     }
 
     public function getApiToken()
@@ -37,11 +40,20 @@ class LinnworksService
                 'Token' => $this->refreshToken
             ])->json();
 
-            $expirationDate = $response['ExpirationDate'];
-            $time = Carbon::parse($expirationDate)->subMinutes(60 * 24);
-            $diff = now()->diffInMinutes($time);
+            if (isset($response['ExpirationDate'])) {
 
-            Cache::put($this->cacheKey, $response, $diff);
+                $expirationDate = $response['ExpirationDate'];
+                $time = Carbon::parse($expirationDate)->subMinutes(60 * 24);
+                $diff = now()->diffInMinutes($time);
+
+                $locality = Configuration::firstWhere('name', 'linnworks_locality');
+                $locality->value = $response['Locality'];
+                $locality->save();
+
+                Cache::put($this->cacheKey, $response, $diff);
+            } else {
+                return null;
+            }
         }
 
         $this->appData = $response;
@@ -59,5 +71,20 @@ class LinnworksService
     public function getUrl(string $relativeUrl): string
     {
         return $this->baseUrl . $relativeUrl;
+    }
+
+    public function getLocalityUrl(string $url = ""): string
+    {
+        $loc = Str::lower($this->locality) ?? "eu";
+
+        return "https://" . $loc . '-ext.linnworks.net/api/' . $url;
+    }
+
+    public function fetch(string $method = "get", string $endpoint = "", array $data = [])
+    {
+        return Http::withHeaders(['Authorization' => $this->getApiToken()])
+            ->acceptJson()
+            ->{$method}($this->getLocalityUrl($endpoint), $data)
+            ->json();
     }
 }
