@@ -40,22 +40,19 @@ class LinnworksService
                 'Token' => $this->refreshToken
             ])->json();
 
-            if (isset($response['ExpirationDate'])) {
+            if (isset($response['TTL'])) {
 
-                $expirationDate = $response['ExpirationDate'];
-                $time = Carbon::parse($expirationDate)->subMinutes(60 * 24);
-                $diff = now()->diffInMinutes($time);
+                $expirationTime = $response['TTL'];
 
                 $locality = Configuration::firstWhere('name', 'linnworks_locality');
                 $locality->value = $response['Locality'];
                 $locality->save();
 
-                Cache::put($this->cacheKey, $response, $diff);
+                Cache::put($this->cacheKey, $response, $expirationTime);
             } else {
                 return null;
             }
         }
-
         $this->appData = $response;
         $this->accessToken = $response['Token'];
 

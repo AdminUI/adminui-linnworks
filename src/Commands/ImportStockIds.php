@@ -2,6 +2,7 @@
 
 namespace AdminUI\AdminUILinnworks\Commands;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use AdminUI\AdminUI\Models\Product;
 use AdminUI\AdminUI\Traits\CliTrait;
@@ -45,25 +46,35 @@ class ImportStockIds extends Command
     public function handle(GetStockIdsAction $action)
     {
         $this->cliMessage('Matching SKU Codes with Linnworks for all products.');
+        $file = fopen('not-found-' . date('Y-m-d') . '.csv', 'w');
+
 
         $page = 0;
         $break = false;
-        $notfound = [];
+        $notFound = collect();
         while ($break === false) {
             $page++;
             $this->info('Processing page ' . $page);
-            $response = $action->execute($page);
-            // if no response break;
+            try {
+                $response = $action->execute($page);
+            } catch (\Exception $e) {
+                $message = $e->getMessage();
+                if (Str::startsWith($message, 'No items found')) {
+                    $this->cliInfo("No results found on this page");
+                } else {
+                    $this->cliFailed($message);
+                }
+                $response = [];
+                $break = true;
+            }
 
-            dump($response);
-
-            $file = fopen('not-found-' . date('Y-m-d') . '.csv', 'w');
             foreach ($response as $item) {
                 $product = Product::where('sku_code', $item['ItemNumber'])->first();
                 if ($product) {
                     $product->linnworks_stock_item_id = $item['StockItemId'];
                     $product->save();
                 } else {
+                    $notFound->add($item['StockItemId']);
                     fputcsv($file, [
                         'sku_code' => $item['ItemNumber'],
                         'name' => $item['ItemTitle'],
@@ -72,10 +83,10 @@ class ImportStockIds extends Command
                 }
                 sleep(0.5);
             }
-            fclose($file);
         }
-        $this->cliMessage('Products unable to match: ' . count($notfound));
+        $this->cliMessage('Products unable to match: ' . $notFound->count());
+        fclose($file);
 
-        $this->cliMessage('all finished');
+        $this->cliMessage('All finished');
     }
 }

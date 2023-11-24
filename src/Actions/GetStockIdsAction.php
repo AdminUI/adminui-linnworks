@@ -18,6 +18,9 @@ class GetStockIdsAction
         if (!empty($sku)) {
             $params['keyword'] = $sku;
         }
-        return Linnworks::fetch("post", "Stock/GetStockItemsFull", $params);
+        $response = Linnworks::fetch("post", "Stock/GetStockItemsFull", $params);
+        if (isset($response['Message'])) {
+            throw new \Exception($response['Message']);
+        } else return $response;
     }
 }
