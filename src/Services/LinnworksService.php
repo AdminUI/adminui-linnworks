@@ -4,6 +4,7 @@ namespace AdminUI\AdminUILinnworks\Services;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use AdminUI\AdminUI\Models\Product;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use AdminUI\AdminUI\Models\Configuration;
@@ -39,6 +40,7 @@ class LinnworksService
                 'ApplicationSecret' => $this->appSecret,
                 'Token' => $this->refreshToken
             ])->json();
+
 
             if (isset($response['TTL'])) {
 

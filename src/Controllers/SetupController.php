@@ -26,7 +26,8 @@ class SetupController extends InertiaCoreController
         return Inertia::render('linnworks::Setup', [
             'linnworksAppId' => config('linnworks.app_id'),
             'linnworksSettings' => Configuration::where('section', 'linnworks')->get(),
-            'linnworksActive' => Linnworks::isConnected()
+            'linnworksActive' => Linnworks::isConnected(),
+            'linnworksStockLocations' => fn () => Linnworks::fetch(endpoint: "Inventory/GetStockLocations")
         ]);
     }
 }

@@ -48,7 +48,6 @@ class ImportStockIds extends Command
         $this->cliMessage('Matching SKU Codes with Linnworks for all products.');
         $file = fopen('not-found-' . date('Y-m-d') . '.csv', 'w');
 
-
         $page = 0;
         $break = false;
         $notFound = collect();

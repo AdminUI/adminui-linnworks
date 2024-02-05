@@ -13,7 +13,7 @@
 				<v-card-text>
 					<AuiSetting
 						title="Sync Orders"
-						help="When enabled, orders placed through AdminUI will be automatically pushed to the linked Xero account"
+						help="When enabled, orders placed through AdminUI will be automatically pushed to the linked Linnworks account"
 					>
 						<v-switch
 							v-model="form.linnworks_sync_orders"
@@ -21,12 +21,53 @@
 							label="Sync Orders"
 						/>
 					</AuiSetting>
+					<AuiSetting title="Live Stock">
+						<template #help>
+							<p>Retrieve stock level directly from Linnworks for linked products.</p>
+							<p>
+								You can select a stock location to use for stock levels, or leave it blank to use the
+								first available location
+							</p>
+						</template>
+						<v-switch
+							v-model="form.linnworks_live_stock"
+							:disabled="!form.linnworks_enabled"
+							label="Use Live Stock"
+						/>
+						<v-select
+							v-model="form.linnworks_live_stock_location"
+							clearable
+							:items="props.linnworksStockLocations"
+							item-value="StockLocationId"
+							item-text="LocationName"
+							outlined
+							dense
+							:disabled="!form.linnworks_live_stock"
+							label="Live Stock Location"
+						>
+							<template #item="{ item }">
+								<div>
+									<span>{{ item.LocationName }}</span>
+									<small class="ml-4">({{ item.ZipCode }})</small>
+								</div>
+							</template>
+						</v-select>
+					</AuiSetting>
+					<AuiSetting
+						title="Live Pricing"
+						help="Retrieve pricing directly from Linnworks for linked products"
+					>
+						<v-switch
+							v-model="form.linnworks_live_pricing"
+							disabled
+							label="Use Live Pricing"
+							persistent-hint
+							hint="Not yet available"
+						/>
+					</AuiSetting>
 					<v-divider class="my-4" />
 					<div class="d-flex justify-space-between">
-						<p>
-							To integrate Linnworks with AdminUI, you'll first need to create an application on your
-							Linnworks account.
-						</p>
+						<p>To integrate Linnworks with AdminUI, you'll first need to link your Linnworks account.</p>
 					</div>
 					<div>
 						<v-list dense>
@@ -78,6 +119,10 @@ const props = defineProps({
 		default: ""
 	},
 	linnworksSettings: {
+		type: Array,
+		default: () => []
+	},
+	linnworksStockLocations: {
 		type: Array,
 		default: () => []
 	}

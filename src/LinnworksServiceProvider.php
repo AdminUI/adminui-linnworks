@@ -3,32 +3,40 @@
 namespace AdminUI\AdminUILinnworks;
 
 use AdminUI\AdminUI\Facades\Seeder;
-use AdminUI\AdminUILinnworks\Commands\ImportStockIds;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Console\Scheduling\Schedule;
 use AdminUI\AdminUILinnworks\Facades\Linnworks;
+use AdminUI\AdminUILinnworks\Commands\ImportStockIds;
 use AdminUI\AdminUILinnworks\Providers\ConfigProvider;
 use AdminUI\AdminUILinnworks\Services\LinnworksService;
+use AdminUI\AdminUILinnworks\Commands\ImportStockLevels;
+use AdminUI\AdminUILinnworks\Providers\LiveStockProvider;
 use AdminUI\AdminUILinnworks\Database\Seeders\NavigationSeeder;
 use AdminUI\AdminUILinnworks\Database\Seeders\ConfigurationSeeder;
+use AdminUI\AdminUILinnworks\Providers\EventServiceProvider;
 
 class LinnworksServiceProvider extends ServiceProvider
 {
     public function register()
     {
         $this->app->register(ConfigProvider::class);
+        $this->app->register(LiveStockProvider::class);
+        $this->app->register(EventServiceProvider::class);
+
         $this->loadRoutesFrom(__DIR__ . '/Routes/admin.php');
 
         $this->app->singleton('linnworks', function () {
             return new LinnworksService;
         });
-        $this->commands([ImportStockIds::class]);
+        $this->commands([ImportStockIds::class, ImportStockLevels::class]);
     }
 
     public function boot()
     {
         $baseDir = dirname(__DIR__);
 
+        $this->setupSchedule();
         Seeder::add([NavigationSeeder::class, ConfigurationSeeder::class]);
 
         if (!$this->app->runningInConsole()) {
@@ -47,6 +55,15 @@ class LinnworksServiceProvider extends ServiceProvider
         }
 
         $this->loadMigrationsFrom(__DIR__ . '/Database/Migrations');
+    }
+
+    private function setupSchedule()
+    {
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->command('adminui:linnworks-stock')->daily();
+            $schedule->command('adminui:linnworks-stock-levels')->everyThirtyMinutes();
+        });
     }
 
     public function pushJavascript()

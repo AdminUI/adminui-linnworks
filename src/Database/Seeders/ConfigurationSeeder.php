@@ -38,8 +38,35 @@ class ConfigurationSeeder extends Seeder
             'is_active' => true
         ]);
 
+        Config::create('linnworks_live_stock', [
+            'label' => 'Live Stock',
+            'value_cast' => 'boolean',
+            'section' => 'linnworks',
+            'type' => 'switch',
+            'is_private' => true,
+            'is_active' => true
+        ], false);
+
+        Config::create('linnworks_live_stock_location', [
+            'label' => 'Live Stock Location',
+            'value_cast' => 'string',
+            'section' => 'linnworks',
+            'type' => 'text',
+            'is_private' => true,
+            'is_active' => true
+        ], "");
+
+        Config::create('linnworks_live_pricing', [
+            'label' => 'Live Pricing',
+            'value_cast' => 'boolean',
+            'section' => 'linnworks',
+            'type' => 'switch',
+            'is_private' => true,
+            'is_active' => true
+        ], false);
+
         Config::create('linnworks_sync_orders', [
-            'label' => 'Enabled',
+            'label' => 'Sync Orders',
             'value_cast' => 'boolean',
             'section' => 'linnworks',
             'type' => 'switch',
